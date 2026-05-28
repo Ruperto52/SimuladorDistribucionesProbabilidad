@@ -194,7 +194,37 @@ Importa las librerías científicas fundamentales de Python. numpy se carga con 
 
 ### Bloque 2: Función `ejecutar_ley_grandes_numeros` (Parte 1 - Muestreo)
 ```python
-
+def ejecutar_ley_grandes_numeros(distribucion, parametros, iteraciones_maximas=10000):
+    dist_nombre = distribucion.lower()
+    
+    # Validación flexible estandarizada
+    if "uniforme" in dist_nombre:
+        datos = np.random.uniform(parametros['a'], parametros['b'], iteraciones_maximas)
+        valor_teorico = (parametros['a'] + parametros['b']) / 2
+        
+    elif "normal" in dist_nombre:
+        datos = np.random.normal(parametros['mu'], parametros['sigma'], iteraciones_maximas)
+        valor_teorico = parametros['mu']
+        
+    elif "binomial" in dist_nombre:
+        datos = np.random.binomial(parametros['n'], parametros['p'], iteraciones_maximas)
+        valor_teorico = parametros['n'] * parametros['p']
+        
+    elif "poisson" in dist_nombre:
+        # Usamos estrictamente la llave 'lambda'
+        datos = np.random.poisson(parametros['lambda'], iteraciones_maximas)
+        valor_teorico = parametros['lambda']
+        
+    elif "geom" in dist_nombre: 
+        datos = np.random.geometric(parametros['p'], iteraciones_maximas)
+        valor_teorico = 1 / parametros['p']
+        
+    elif "exponencial" in dist_nombre:
+        datos = np.random.exponential(parametros['beta'], iteraciones_maximas)
+        valor_teorico = parametros['beta']
+        
+    else:
+        raise ValueError(f"Distribución '{distribucion}' no soportada en la simulación LGN.")
 ```
 **¿Qué hace?** Esta primera mitad de la función recibe la instrucción de simular una distribución específica. Extrae un vector masivo de datos crudos simulados (por defecto, 10,000 datos) y calcula paralelamente el valor exacto de la esperanza matemática teórica ($E[X]$) que servirá como línea base de comparación.
 **Lógica y Puntos Clave:** 
