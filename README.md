@@ -1,5 +1,4 @@
 # Simulador de Distribuciones de Probabilidad y Visualizaciones Gráficas
-Dentro de este proyecto se explora lo que son las distribuciones de probabilidad para las variables continuas y las variables discretas, una forma de hacer un simulador de estas mismas con interfaz grafica y con las opciones de guardar los resultados obtenidos para garantizar su comprension de cada una de las distribuciones
 
 ## Información de los Integrantes
 * **Institución:** Instituto Politécnico Nacional (IPN)
@@ -194,37 +193,7 @@ Importa las librerías científicas fundamentales de Python. numpy se carga con 
 
 ### Bloque 2: Función `ejecutar_ley_grandes_numeros` (Parte 1 - Muestreo)
 ```python
-def ejecutar_ley_grandes_numeros(distribucion, parametros, iteraciones_maximas=10000):
-    dist_nombre = distribucion.lower()
-    
-    # Validación flexible estandarizada
-    if "uniforme" in dist_nombre:
-        datos = np.random.uniform(parametros['a'], parametros['b'], iteraciones_maximas)
-        valor_teorico = (parametros['a'] + parametros['b']) / 2
-        
-    elif "normal" in dist_nombre:
-        datos = np.random.normal(parametros['mu'], parametros['sigma'], iteraciones_maximas)
-        valor_teorico = parametros['mu']
-        
-    elif "binomial" in dist_nombre:
-        datos = np.random.binomial(parametros['n'], parametros['p'], iteraciones_maximas)
-        valor_teorico = parametros['n'] * parametros['p']
-        
-    elif "poisson" in dist_nombre:
-        # Usamos estrictamente la llave 'lambda'
-        datos = np.random.poisson(parametros['lambda'], iteraciones_maximas)
-        valor_teorico = parametros['lambda']
-        
-    elif "geom" in dist_nombre: 
-        datos = np.random.geometric(parametros['p'], iteraciones_maximas)
-        valor_teorico = 1 / parametros['p']
-        
-    elif "exponencial" in dist_nombre:
-        datos = np.random.exponential(parametros['beta'], iteraciones_maximas)
-        valor_teorico = parametros['beta']
-        
-    else:
-        raise ValueError(f"Distribución '{distribucion}' no soportada en la simulación LGN.")
+
 ```
 **¿Qué hace?** Esta primera mitad de la función recibe la instrucción de simular una distribución específica. Extrae un vector masivo de datos crudos simulados (por defecto, 10,000 datos) y calcula paralelamente el valor exacto de la esperanza matemática teórica ($E[X]$) que servirá como línea base de comparación.
 **Lógica y Puntos Clave:** 
@@ -480,6 +449,70 @@ with pestana4:
 
 * Líneas de Anclaje Analítico (axhline): En la Ley de los Grandes Números, se traza una línea horizontal estática en el eje $Y$ equivalente al valor teórico ($E[X]$). Esto genera un anclaje visual dramático para que el usuario observe cómo la "serpiente" de la media empírica fluctúa al inicio pero se adhiere indisolublemente a la línea de control al llegar a $N=10,000$.
 
-## 6. Uso del Software desarrollado
+## 6. Uso del Software Desarrollado
+
 ### Primeros pasos
-### Dentro de la aplicacion
+
+Para garantizar que el simulador se ejecute en cualquier computadora (Windows, macOS o Linux) sin generar errores de compatibilidad de librerías, el proyecto está completamente empaquetado mediante contenedores.
+
+1. **Clonar el repositorio:**
+
+   Abre tu terminal y descarga el código fuente ejecutando:
+
+   ```bash
+   git clone (https://github.com/Ruperto52/SimuladorDistribucionesProbabilidad.git)
+   cd SimuladorDistribucionesProbabilidad
+   ```
+2. **Ejecutar el entorno aislado:**
+
+    Levanta la aplicación montando tu directorio actual como volumen. Esto permite que el contenedor exponga el servicio web en el puerto 8501:
+
+    ```bash
+    sudo docker run -p 8501:8501 -v $(pwd):/app simulador-estadistica
+    ```
+    (Nota: Si no estás en un entorno basado en Linux, puedes omitir el sudo y adaptar el mapeo de ruta $(pwd) según tu sistema operativo).
+
+3. Acceder a la interfaz:
+    Abre tu navegador web de preferencia (Chrome, Firefox, Safari) e ingresa a la siguiente dirección local:
+    http://localhost:8501
+
+### Dentro de la aplicación
+La plataforma está diseñada para ser altamente intuitiva, estructurada en un panel de control lateral y un área de trabajo principal dividida en cuatro pestañas de análisis.
+
+---
+
+#### A. Barra Lateral (Panel de Configuración General)
+
+* Tamaño de Muestra (N): Lo primero que debes hacer es definir la cantidad de datos aleatorios a simular. Puedes usar las flechas del cuadro de texto o escribir un número (por defecto es 1000).
+
+* Seleccione Distribución: Usa el menú desplegable para elegir entre modelos discretos (Binomial, Poisson, Geométrica) o continuos (Normal, Uniforme, Exponencial).
+
+* Controles Dinámicos: Al seleccionar un modelo, el menú cambiará automáticamente para pedirte los parámetros matemáticos exclusivos de esa distribución (como mu y sigma para la Normal, o la probabilidad p para la Binomial).
+
+#### B. Pestaña 1: Simulación Individual
+
+* Esta es la vista principal. Al lado izquierdo, encontrarás una tabla que compara matemáticamente la Media, Varianza y Desviación Estándar empírica (la simulada) contra los valores teóricos perfectos.
+
+* En la parte inferior izquierda tienes botones habilitados para exportar el vector de datos simulados en formato .CSV.
+
+* Al lado derecho, verás la representación gráfica. En modelos continuos verás un histograma suavizado superpuesto por una línea teórica sólida, y en modelos discretos verás gráficas de barras con marcadores punteados. Puedes descargar este gráfico en alta resolución (.PNG).
+
+#### C. Pestaña 2: Comparación Simultánea
+
+* Diseñada para contrastar dos modelos al mismo tiempo. Selecciona una distribución en la lista "Distribución A" y otra diferente en la lista "Distribución B".
+
+* El sistema generará dos áreas de densidad superpuestas en el mismo lienzo, permitiéndote analizar visualmente las diferencias en la dispersión, la forma y el centro de gravedad de dos variables aleatorias distintas.
+
+#### D. Pestaña 3: Ley de los Grandes Números
+
+* Esta sección demuestra la convergencia asintótica del promedio. No requieres configurar nada extra; el simulador extraerá la distribución que tienes seleccionada en la barra lateral y simulará 10,000 iteraciones automáticas.
+
+* En la gráfica, la línea horizontal punteada representa el valor exacto esperado matemáticamente, mientras que la línea continua muestra el comportamiento caótico inicial de los promedios y cómo terminan estabilizándose sobre la línea de referencia.
+
+#### E. Pestaña 4: Teorema del Límite Central
+
+* Aquí podrás comprobar cómo la suma de distribuciones de cualquier forma colapsa en una campana de Gauss.
+
+* Usa los dos deslizadores integrados en la pestaña: el primero define cuántas simulaciones independientes quieres correr, y el segundo define el tamaño de los datos extraídos en cada una de ellas.
+
+* Al soltar los deslizadores, el sistema calculará todos los promedios individuales y graficará un histograma que revelará la forma de una distribución normal, validando visualmente el teorema.
